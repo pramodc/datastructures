@@ -1,22 +1,22 @@
 #include<iostream>
 #include<algorithm>
-namespace myDS {
+namespace MyDS {
 //fwd decl
-template <class TKey, class TVal> class rbTreeNode;
-template <class TKey, class TVal> class rbTree;
+template <class TKey, class TVal> class RBTreeNode;
+template <class TKey, class TVal> class RBTree;
 
-enum class nodeColor {RED, BLACK};
+enum class NodeColor {RED, BLACK};
 
 ///////////////////////////////Treenode visitors///////////////////////////////
 template<class TKey, class TVal>
-class treeNodeVisitor {
+class TreeNodeVisitor {
 public: 
 	virtual void operator () (TKey aKey, TVal aVal, std::string aColor, size_t aLevel) = 0 ;
 	virtual void operator () () = 0;
 };
 
 template<class TKey, class TVal>
-class treeNodePrintVisitor : public treeNodeVisitor<TKey,TVal> {
+class TreeNodePrintVisitor : public TreeNodeVisitor<TKey,TVal> {
 public:
 	virtual void operator () (TKey aKey, TVal aVal, std::string aColor, size_t aLevel) {
 		std::cout << aKey << "(" << aColor << ") ";
@@ -28,9 +28,9 @@ public:
 };
 
 template <class TKey, class TVal>
-class treeNodeStatVisitor : public treeNodeVisitor<TKey, TVal> {
+class TreeNodeStatVisitor : public TreeNodeVisitor<TKey, TVal> {
 public:
-	treeNodeStatVisitor() {
+	TreeNodeStatVisitor() {
 		mNodes = 0;
 		mHeight = 0;
 		mBlackHeight = 0;
@@ -55,67 +55,110 @@ public:
 
 ///////////////////////////////////Treenode////////////////////////////////////
 template<class TKey, class TVal>
-class rbTreeNode {
+class RBTreeNode {
 
-friend class rbTree <TKey, TVal>;
+friend class RBTree <TKey, TVal>;
 
 private:
-	rbTreeNode () {
+	RBTreeNode () {
 		mLeft = nullptr;
 		mRight = nullptr;
 		mParent = nullptr;
-		mColor = nodeColor::BLACK;
+		mColor = NodeColor::BLACK;
 	} 
-	rbTreeNode (TKey aKey, TVal aVal, nodeColor aCol) : mKey(aKey), mVal(aVal), mColor(aCol) {
-		mLeft = nullptr;
-		mRight = nullptr;
-		mParent = nullptr;
-	} 
-	rbTreeNode (TKey aKey, TVal aVal, nodeColor aCol, rbTreeNode* aLeft, rbTreeNode* aRight, rbTreeNode* aParent) 
+
+	RBTreeNode (TKey aKey, TVal aVal, NodeColor aCol, RBTreeNode* aLeft, RBTreeNode* aRight, RBTreeNode* aParent) 
 						: mKey(aKey), mVal(aVal), mColor(aCol), mLeft(aLeft), mRight(aRight), mParent(aParent) 
 	{
 	} 
-	rbTreeNode* mLeft;
-	rbTreeNode* mRight;
-	rbTreeNode* mParent;
+	
 	TKey mKey;
 	TVal mVal;
-	nodeColor mColor; 
+
+	RBTreeNode* mLeft;
+	RBTreeNode* mRight;
+	RBTreeNode* mParent;
+	NodeColor mColor; 
 };
 
-/////////////////////////////////////rbTree/////////////////////////////////////
+/////////////////////////////////////RBTree/////////////////////////////////////
 template <class TKey, class TVal>
-class rbTree {
+class RBTree {
 public:
-	rbTree();
+	RBTree();
 	TVal* find (TKey aKey);
 	TKey min ();
 	TKey max ();
 	bool insert (TKey aKey, TVal aVal);
 	bool deleteKey (TKey aKey);
-	void inOrderWalk (treeNodeVisitor<TKey, TVal>& visitor);
-	void preOrderWalk (treeNodeVisitor<TKey, TVal>& visitor);
+	void inOrderWalk (TreeNodeVisitor<TKey, TVal>& visitor);
+	void preOrderWalk (TreeNodeVisitor<TKey, TVal>& visitor);
 	bool verifyRB() ;
 	void printStats() ;
 	int setVerbosity(int aLevel);
 private:
-	rbTreeNode<TKey, TVal>* mRoot;
-	rbTreeNode<TKey, TVal>* mNil;
+	RBTreeNode<TKey, TVal>* mRoot;
+	RBTreeNode<TKey, TVal>* mNil;
 	int mVerbose;
 
-	bool insert (rbTreeNode<TKey, TVal>*, TKey aKey, TVal aVal);
-	rbTreeNode<TKey, TVal>* findNode (TKey aKey);
-	rbTreeNode<TKey, TVal>* max (rbTreeNode<TKey, TVal>* aNode);
-	rbTreeNode<TKey, TVal>* min (rbTreeNode<TKey, TVal>* aNode);
-	void inOrderWalk (rbTreeNode<TKey, TVal>* aNode, size_t aLevel, treeNodeVisitor<TKey, TVal>& visitor);
-	void preOrderWalk (rbTreeNode<TKey, TVal>* aNode, size_t aLevel, treeNodeVisitor<TKey, TVal>& visitor);
-	bool verifyRB(rbTreeNode<TKey, TVal> * aNode, size_t & aBH) ;
+	bool insert (RBTreeNode<TKey, TVal>*, TKey aKey, TVal aVal);
+	RBTreeNode<TKey, TVal>* findNode (TKey aKey);
+	RBTreeNode<TKey, TVal>* max (RBTreeNode<TKey, TVal>* aNode);
+	RBTreeNode<TKey, TVal>* min (RBTreeNode<TKey, TVal>* aNode);
+	void inOrderWalk (RBTreeNode<TKey, TVal>* aNode, size_t aLevel, TreeNodeVisitor<TKey, TVal>& visitor);
+	void preOrderWalk (RBTreeNode<TKey, TVal>* aNode, size_t aLevel, TreeNodeVisitor<TKey, TVal>& visitor);
+	bool verifyRB(RBTreeNode<TKey, TVal> * aNode, size_t & aBH) ;
 
-	void leftRotate (rbTreeNode<TKey, TVal>* aNode);
-	void rightRotate (rbTreeNode<TKey, TVal>* aNode);
-	void rbTreeInsertFixup (rbTreeNode<TKey, TVal>* aNode);
-	void rbTreeDeleteFixup (rbTreeNode<TKey, TVal>* aNode);
+	void leftRotate (RBTreeNode<TKey, TVal>* aNode);
+	void rightRotate (RBTreeNode<TKey, TVal>* aNode);
+	void rbTreeInsertFixup (RBTreeNode<TKey, TVal>* aNode);
+	void rbTreeDeleteFixup (RBTreeNode<TKey, TVal>* aNode);
 
+	//Accessor functions
+	RBTreeNode<TKey,TVal>* leftOf(RBTreeNode<TKey,TVal>* aNode) const {
+		return aNode->mLeft;
+	}
+	
+	RBTreeNode<TKey,TVal>* rightOf(RBTreeNode<TKey,TVal>* aNode) const {
+		return aNode->mRight;
+	}
+
+	RBTreeNode<TKey,TVal>* parentOf(RBTreeNode<TKey,TVal>* aNode) const {
+		return aNode->mParent;
+	}
+
+	NodeColor colorOf(RBTreeNode<TKey,TVal>* aNode) const {
+		return aNode->mColor;
+	}
+
+	bool isRED(RBTreeNode<TKey,TVal>* aNode) const {
+		return (aNode->mColor == NodeColor::RED);
+	}
+
+	bool isBLACK(RBTreeNode<TKey,TVal>* aNode) const {
+		return (aNode->mColor == NodeColor::BLACK);
+	}
+
+	//set functions
+	void setParent(RBTreeNode<TKey, TVal>* aDest, RBTreeNode<TKey, TVal>* aSrc) {
+		aDest->mParent = aSrc;
+	}
+	void setLeft(RBTreeNode<TKey, TVal>* aDest, RBTreeNode<TKey, TVal>* aSrc) {
+		aDest->mLeft = aSrc;
+	}
+	void setRight(RBTreeNode<TKey, TVal>* aDest, RBTreeNode<TKey, TVal>* aSrc) {
+		aDest->mRight = aSrc;
+	}
+
+	void setRED(RBTreeNode<TKey, TVal>* aNode) {
+		aNode->mColor = NodeColor::RED;
+	}
+	void setBLACK(RBTreeNode<TKey, TVal>* aNode) {
+		aNode->mColor = NodeColor::BLACK;
+	}
+	void setColor(RBTreeNode<TKey, TVal>* aNode, NodeColor aColor) {
+		aNode->mColor = aColor;
+	}
 };
-}//namespace myDS
+}//namespace MyDS
 #include "rbt.cpp"

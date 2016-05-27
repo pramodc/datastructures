@@ -1,20 +1,20 @@
 #include<iostream>
 #include <cstddef>
-namespace myDS {
-/////////////////////////////////////rbTree/////////////////////////////////////
+namespace MyDS {
+/////////////////////////////////////RBTree/////////////////////////////////////
 template <class TKey, class TVal> 
-rbTree<TKey, TVal>::rbTree()
+RBTree<TKey, TVal>::RBTree()
 {
 
-	mNil = new rbTreeNode<TKey, TVal>();
-	mNil->mColor = nodeColor::BLACK;
+	mNil = new RBTreeNode<TKey, TVal>();
+	setBLACK(mNil);
 
 	mRoot = mNil;
 	mVerbose = 0;
 }
 
 template <class TKey, class TVal>
-int    rbTree<TKey, TVal>  :: setVerbosity(int aLevel) 
+int    RBTree<TKey, TVal>  :: setVerbosity(int aLevel) 
 {
 	mVerbose = aLevel;
 	return mVerbose;
@@ -22,19 +22,19 @@ int    rbTree<TKey, TVal>  :: setVerbosity(int aLevel)
 
 ////////////////////////////////////rbtree lookup///////////////////////////////////
 template <class TKey, class TVal> 
-TVal*    rbTree<TKey, TVal> :: find(TKey aKey)
+TVal*    RBTree<TKey, TVal> :: find(TKey aKey)
 {
-	rbTreeNode<TKey, TVal>* node = mRoot;
+	RBTreeNode<TKey, TVal>* node = mRoot;
 
 	while (node != mNil) {
 		if (aKey == node->mKey) {
 			return &(node->mVal);
 		}	
 		else if (aKey <= node->mKey) {
-			node = node->mLeft;
+			node = leftOf(node);
 		}	
 		else {
-			node = node->mRight;
+			node = rightOf(node);
 		}
 	}
 	//not found
@@ -42,19 +42,19 @@ TVal*    rbTree<TKey, TVal> :: find(TKey aKey)
 }
 
 template <class TKey, class TVal> 
-rbTreeNode<TKey, TVal>*    rbTree<TKey, TVal> :: findNode(TKey aKey)
+RBTreeNode<TKey, TVal>*    RBTree<TKey, TVal> :: findNode(TKey aKey)
 {
-	rbTreeNode<TKey, TVal>* node = mRoot;
+	RBTreeNode<TKey, TVal>* node = mRoot;
 
 	while (node != mNil) {
 		if (aKey == node->mKey) {
 			return node;
 		}	
 		else if (aKey <= node->mKey) {
-			node = node->mLeft;
+			node = leftOf(node);
 		}	
 		else {
-			node = node->mRight;
+			node = rightOf(node);
 		}
 	}
 	//not found
@@ -62,57 +62,57 @@ rbTreeNode<TKey, TVal>*    rbTree<TKey, TVal> :: findNode(TKey aKey)
 }
 
 template <class TKey, class TVal>
-rbTreeNode<TKey, TVal>*    rbTree<TKey, TVal> :: max(rbTreeNode<TKey,TVal>* aNode)
+RBTreeNode<TKey, TVal>*    RBTree<TKey, TVal> :: max(RBTreeNode<TKey,TVal>* aNode)
 {
-	rbTreeNode<TKey, TVal>* node = aNode;
-	rbTreeNode<TKey, TVal>* parent = mNil;
+	RBTreeNode<TKey, TVal>* node = aNode;
+	RBTreeNode<TKey, TVal>* parent = mNil;
 
 	if (!aNode) node = mRoot;
 	else node = aNode;
 
 	while (node != mNil) {
 		parent = node;
-		node = node->mRight;	
+		node = rightOf(node);
 	}
 	return parent;
 }
 
 template <class TKey, class TVal>
-TKey    rbTree<TKey, TVal> :: max()
+TKey    RBTree<TKey, TVal> :: max()
 {
-	rbTreeNode<TKey, TVal>* node = max(mRoot);
+	RBTreeNode<TKey, TVal>* node = max(mRoot);
 	return node->mKey;
 }
 
 template <class TKey, class TVal>
-rbTreeNode<TKey, TVal>*    rbTree<TKey, TVal> :: min(rbTreeNode<TKey, TVal>* aNode)
+RBTreeNode<TKey, TVal>*    RBTree<TKey, TVal> :: min(RBTreeNode<TKey, TVal>* aNode)
 {
-	rbTreeNode<TKey, TVal>* node = aNode;
-	rbTreeNode<TKey, TVal>* parent = mNil;
+	RBTreeNode<TKey, TVal>* node = aNode;
+	RBTreeNode<TKey, TVal>* parent = mNil;
 
 	if (!aNode) node = mRoot;
 	while (node != mNil) {
 		parent = node;
-		node = node->mLeft;
+		node = leftOf(node);
 	}
 	return parent;
 }
 
 template <class TKey, class TVal>
-TKey    rbTree<TKey, TVal> :: min()
+TKey    RBTree<TKey, TVal> :: min()
 {
-	rbTreeNode<TKey, TVal>* node = min(mRoot);
+	RBTreeNode<TKey, TVal>* node = min(mRoot);
 	return node->mKey;
 }
 
 ////////////////////////////////////rbtree modify///////////////////////////////////
 template <class TKey, class TVal> 
-bool    rbTree<TKey, TVal> :: insert(TKey aKey, TVal aVal) 
+bool    RBTree<TKey, TVal> :: insert(TKey aKey, TVal aVal) 
 {
-	rbTreeNode<TKey, TVal> *node, *parent;
+	RBTreeNode<TKey, TVal> *node, *parent;
 
 	if (mRoot == mNil) {
-		mRoot = new rbTreeNode<TKey, TVal>(aKey, aVal, nodeColor::BLACK, mNil, mNil, mNil);//root is black
+		mRoot = new RBTreeNode<TKey, TVal>(aKey, aVal, NodeColor::BLACK, mNil, mNil, mNil);//root is black
 		return true;
 	}
 	//return (insert (mRoot, aKey, aVal));
@@ -121,11 +121,11 @@ bool    rbTree<TKey, TVal> :: insert(TKey aKey, TVal aVal)
 	while (node != mNil) {
 		if (aKey < node->mKey) {
 			parent = node;
-			node = node->mLeft;
+			node = leftOf(node);
 		}
 		else if (aKey > node->mKey) {
 			parent = node;
-			node = node->mRight;
+			node = rightOf(node);
 		}
 		else /*(aKey == node->mKey)*/ {
 			//duplicate keys not supported, replace node
@@ -135,33 +135,33 @@ bool    rbTree<TKey, TVal> :: insert(TKey aKey, TVal aVal)
 	}
 	if (node == mNil) {
 		if (aKey < parent->mKey) {
-			parent->mLeft = new rbTreeNode<TKey, TVal>(aKey, aVal, nodeColor::RED, mNil, mNil, parent);
+			setLeft(parent, new RBTreeNode<TKey, TVal>(aKey, aVal, NodeColor::RED, mNil, mNil, parent));
 			if (mVerbose >= 2) {
 				std::cout << "Walk before fixup" << std::endl;
-				treeNodePrintVisitor<TKey, TVal> printvisitor;
+				TreeNodePrintVisitor<TKey, TVal> printvisitor;
 				preOrderWalk(printvisitor);
 				std::cout << std::endl;
 			}
-			rbTreeInsertFixup(parent->mLeft);
+			rbTreeInsertFixup(leftOf(parent));
 			if (mVerbose >= 2) {
 				std::cout << "Walk after fixup" << std::endl;
-				treeNodePrintVisitor<TKey, TVal> printvisitor;
+				TreeNodePrintVisitor<TKey, TVal> printvisitor;
 				preOrderWalk(printvisitor);
 				std::cout << std::endl;
 			}
 		}
 		else {
-			parent->mRight = new rbTreeNode<TKey, TVal>(aKey, aVal, nodeColor::RED, mNil, mNil, parent);
+			setRight(parent, new RBTreeNode<TKey, TVal>(aKey, aVal, NodeColor::RED, mNil, mNil, parent));
 			if (mVerbose >= 2) {
 				std::cout << "Walk before fixup" << std::endl;
-				treeNodePrintVisitor<TKey, TVal> printvisitor;
+				TreeNodePrintVisitor<TKey, TVal> printvisitor;
 				preOrderWalk(printvisitor);
 				std::cout << std::endl;
 			}
-			rbTreeInsertFixup(parent->mRight);
+			rbTreeInsertFixup(rightOf(parent));
 			if (mVerbose >= 2) {
 				std::cout << "Walk after fixup" << std::endl;
-				treeNodePrintVisitor<TKey, TVal> printvisitor;
+				TreeNodePrintVisitor<TKey, TVal> printvisitor;
 				preOrderWalk(printvisitor);
 				std::cout << std::endl;
 			}
@@ -172,11 +172,11 @@ bool    rbTree<TKey, TVal> :: insert(TKey aKey, TVal aVal)
 
 
 template <class TKey, class TVal> 
-bool    rbTree<TKey, TVal> :: deleteKey(TKey aKey)
+bool    RBTree<TKey, TVal> :: deleteKey(TKey aKey)
 {
-	rbTreeNode<TKey, TVal>* z = mRoot;
-	rbTreeNode<TKey, TVal>* parent = mNil, **replacePtr = &mNil;
-	rbTreeNode<TKey, TVal>* y, *x;
+	RBTreeNode<TKey, TVal>* z = mRoot;
+	RBTreeNode<TKey, TVal>* parent = mNil, **replacePtr = &mNil;
+	RBTreeNode<TKey, TVal>* y, *x;
 
 	z = findNode(aKey);
 	if (z == mNil) return false;
@@ -187,33 +187,33 @@ bool    rbTree<TKey, TVal> :: deleteKey(TKey aKey)
 	//find the max of the left subtree or min of the right subtree to replace the deleted node
 
 	//find the replacement node y
-	if (z->mLeft == mNil || z->mRight == mNil) {
+	if (leftOf(z) == mNil || rightOf(z) == mNil) {
 		y = z;
 	}
 	else {
 		//find the node predecessor of z, this node has Nil right child
-		y = max(z->mLeft);
-		// or y = min(z->mRight);
+		y = max(leftOf(z));
+		// or y = min(rightOf(z));
 	}
 
 	//copy contents of y to z and delete y
 
 	//x is y's only child
-	if (y->mLeft != mNil) 
-		x = y->mLeft;
+	if (leftOf(y) != mNil) 
+		x = leftOf(y);
 	else
-		x = y->mRight;
+		x = rightOf(y);
 
-	x->mParent = y->mParent;
+	setParent(x, parentOf(y));
 
 	if (y == mRoot) {
 		mRoot = x;
 	}
 	else {
-		if (y == y->mParent->mLeft) 
-			y->mParent->mLeft = x;
+		if (y == leftOf(parentOf(y)))
+			setLeft(parentOf(y), x);
 		else
-			y->mParent->mRight = x;
+			setRight(parentOf(y), x);
 	}
 
 	if (y != z) {
@@ -221,7 +221,7 @@ bool    rbTree<TKey, TVal> :: deleteKey(TKey aKey)
 		z->mVal = y->mVal;
 	}
 
-	if (y->mColor == nodeColor::BLACK) {
+	if (isBLACK(y)) {
 		//y will be removed and if it is RED it implies 
 		//no change in BH, no adjacent red node, and it cannot be root
 		rbTreeDeleteFixup(x);
@@ -231,11 +231,11 @@ bool    rbTree<TKey, TVal> :: deleteKey(TKey aKey)
 
 //////////////////RB tree balancing routines/////////////////////
 template <class TKey, class TVal> 
-void    rbTree<TKey, TVal> :: leftRotate(rbTreeNode<TKey, TVal>* aNode)
+void    RBTree<TKey, TVal> :: leftRotate(RBTreeNode<TKey, TVal>* aNode)
 {
 	//x is parent, y is right child of x, rotate x
 
-	rbTreeNode<TKey, TVal> *x, *y, *p_x;
+	RBTreeNode<TKey, TVal> *x, *y, *p_x;
 	x = aNode;
 	
 	if (x == mNil || !x) return;
@@ -244,33 +244,33 @@ void    rbTree<TKey, TVal> :: leftRotate(rbTreeNode<TKey, TVal>* aNode)
 		std::cout << "Left Rotate: " << x->mKey << std::endl;
 	}
 
-	if (x->mRight == mNil) {
+	if (rightOf(x) == mNil) {
 		std::cout << "No right child, no left rotation possible" << std::endl;
 		return;
 	}
 
-	y = x->mRight;
+	y = rightOf(x);
 	//x is the rotation point, y is x's right child
 	//change the parent of x to refer to y 
 
-	p_x = x->mParent;
+	p_x = parentOf(x);
 	
 	if (p_x != mNil) {
-		if (p_x->mLeft == x)
-			p_x->mLeft = y;
+		if (leftOf(p_x) == x)
+			setLeft(p_x, y);
 		else
-			p_x->mRight = y;
+			setRight(p_x, y);
 	}
 
 	//fix x's pointers
-	x->mParent = y;
-	x->mRight =  y->mLeft;
-	if (y->mLeft != mNil) {
-		y->mLeft->mParent = x;
+	setParent(x, y);
+	setRight(x, leftOf(y));
+	if (leftOf(y) != mNil) {
+		setParent(leftOf(y), x);
 	}
 	//fix y's pointers
-	y->mParent = p_x;
-	y->mLeft = x;
+	setParent(y, p_x);
+	setLeft(y, x);
 
 	if (x == mRoot) {
 		mRoot = y;
@@ -280,9 +280,9 @@ void    rbTree<TKey, TVal> :: leftRotate(rbTreeNode<TKey, TVal>* aNode)
 }
 
 template <class TKey, class TVal>
-void    rbTree<TKey, TVal> :: rightRotate(rbTreeNode<TKey, TVal> * aNode)
+void    RBTree<TKey, TVal> :: rightRotate(RBTreeNode<TKey, TVal> * aNode)
 {
-	rbTreeNode<TKey, TVal> *x, *y, *p_y;
+	RBTreeNode<TKey, TVal> *x, *y, *p_y;
 	//y is parent, x is left child of y, rotate y
 	y = aNode;
 	if (y==mNil || !y) {
@@ -293,28 +293,28 @@ void    rbTree<TKey, TVal> :: rightRotate(rbTreeNode<TKey, TVal> * aNode)
 		std::cout << "Right Rotate: " << y->mKey << std::endl;
 	}
 
-	if (y->mLeft == mNil) {
+	if (leftOf(y) == mNil) {
 		std::cout << "No left child, no right rotation possible" << std::endl;
 	}
 
-	x = y->mLeft;
-	p_y = y->mParent;
+	x = leftOf(y);
+	p_y = parentOf(y);
 
 	if (p_y != mNil) {
-		if (p_y->mLeft == y) {
-			p_y->mLeft = x;
+		if (leftOf(p_y) == y) {
+			setLeft(p_y, x);
 		}
 		else {
-			p_y->mRight = x;
+			setRight(p_y, x);
 		}
 	}
-	y->mParent = x;
-	y->mLeft = x->mRight;
-	if (x->mRight != mNil) {
-		x->mRight->mParent = y;
+	setParent(y, x);
+	setLeft(y, rightOf(x));
+	if (rightOf(x) != mNil) {
+		setParent(rightOf(x), y);
 	}
-	x->mParent = p_y;
-	x->mRight = y;
+	setParent(x, p_y);
+	setRight(x, y);
 
 	if (y == mRoot) {
 		mRoot = x;
@@ -323,216 +323,217 @@ void    rbTree<TKey, TVal> :: rightRotate(rbTreeNode<TKey, TVal> * aNode)
 }
 
 template <class TKey, class TVal>
-void    rbTree<TKey, TVal> :: rbTreeInsertFixup (rbTreeNode<TKey, TVal>* aNode)
+void    RBTree<TKey, TVal> :: rbTreeInsertFixup (RBTreeNode<TKey, TVal>* aNode)
 {
-	rbTreeNode<TKey, TVal>* z = aNode;
-	rbTreeNode<TKey, TVal>* y;
+	RBTreeNode<TKey, TVal>* z = aNode;
+	RBTreeNode<TKey, TVal>* y;
 	if (z == mNil) return;
 
-	while (z->mParent->mColor == nodeColor::RED) {
+	while (isRED(parentOf(z))) {
 		//y is z's uncle 
-		if (z->mParent == z->mParent->mParent->mLeft) {
+		if (parentOf(z) == leftOf(parentOf(parentOf(z)))) {
 			//y is RED => change z's parent and z's uncle to black and z's grand parent to red
-			y = z->mParent->mParent->mRight;
-			if (y->mColor == nodeColor::RED) {
-				y->mColor = nodeColor::BLACK;
-				z->mParent->mColor = nodeColor::BLACK;
-				z->mParent->mParent->mColor = nodeColor::RED;
-				z = z->mParent->mParent;
+			y = rightOf(parentOf(parentOf(z))); 
+			if (isRED(y)) {
+				setBLACK(y);
+				setBLACK(parentOf(z));
+				setRED(parentOf(parentOf(z)));
+				z = parentOf(parentOf(z));
 			}
 			else {
 				//y is black, then 2 cases
 				//1. z is right child of its parent
 				//2. z is a left child of its parent
-				if (z == z->mParent->mRight) {
+				if (z == rightOf(parentOf(z))) {
 					//convert situation in 1. to 2.
-					z = z->mParent;
+					z = parentOf(z);
 					leftRotate(z);
 				}
-				z->mParent->mColor = nodeColor::BLACK;
-				z->mParent->mParent->mColor = nodeColor::RED;
-				rightRotate(z->mParent->mParent);
+				setBLACK(parentOf(z));
+				setRED(parentOf(parentOf(z)));
+
+				rightRotate(parentOf(parentOf(z)));
 			}
 		}
 		else {
 			//y is RED => change z's parent and z's uncle to black and z's grand parent to red
-			y = z->mParent->mParent->mLeft;
-			if (y->mColor == nodeColor::RED) {
-				y->mColor = nodeColor::BLACK;
-				z->mParent->mColor = nodeColor::BLACK;
-				z->mParent->mParent->mColor = nodeColor::RED;
-				z = z->mParent->mParent;
+			y = leftOf(parentOf(parentOf(z))); 
+			if (isRED(y)) {
+				setBLACK(y);
+				setBLACK(parentOf(z));
+				setRED(parentOf(parentOf(z)));
+
+				z = parentOf(parentOf(z));
 			}
 			else {
 				//y is black, then 2 cases
 				//1. z is left child of its parent
 				//2. z is right child of its parent
-				if (z == z->mParent->mLeft) {
-					z = z->mParent;
+				if (z == leftOf(parentOf(z))) {
+					z = parentOf(z);
 					rightRotate(z);
 				}
-				z->mParent->mColor = nodeColor::BLACK;
-				z->mParent->mParent->mColor = nodeColor::RED;
-				leftRotate(z->mParent->mParent);	
+				setBLACK(parentOf(z));
+				setRED(parentOf(parentOf(z)));
+				leftRotate(parentOf(parentOf(z)));	
 			}
 
 		}
 	}
-	mRoot->mColor = nodeColor::BLACK;
+	setBLACK(mRoot);
 	return;
 }
 
 template <class TKey, class TVal>
-void    rbTree<TKey, TVal> :: rbTreeDeleteFixup (rbTreeNode<TKey, TVal> * aNode)
+void    RBTree<TKey, TVal> :: rbTreeDeleteFixup (RBTreeNode<TKey, TVal> * aNode)
 {
-	rbTreeNode<TKey, TVal> *x, *y, *w;
+	RBTreeNode<TKey, TVal> *x, *y, *w;
 
 	x = aNode;
-	while (x != mRoot && x->mColor == nodeColor::BLACK) {
-		if (x->mParent->mLeft == x) {
+	while (x != mRoot && isBLACK(x)) {
+		if (leftOf(parentOf(x)) == x) {
 			//if x is its parent's left child
-			w = x->mParent->mRight; //w is x's sibling
+			w = rightOf(parentOf(x)); //w is x's sibling
 			//4 cases
 			//case-1
-			if (w->mColor == nodeColor::RED) {
-				w->mColor = nodeColor::BLACK;
-				x->mParent->mColor = nodeColor::RED;
-				leftRotate(x->mParent);
-				w = x->mParent->mRight;
+			if (isRED(w)) {
+				setBLACK(w);
+				setRED(parentOf(x));
+				leftRotate(parentOf(x));
+				w = rightOf(parentOf(x));
 			}
 			//fall-through
 			//sibling of w is now Black
-			if (w->mLeft->mColor == nodeColor::BLACK && w->mRight->mColor == nodeColor::BLACK) {
+			if (isBLACK(leftOf(w)) && isBLACK(rightOf(w))) {
 				//case-2: both of w's children are black
-				w->mColor = nodeColor::RED;
-				x = x->mParent;
+				setRED(w);
+				x = parentOf(x);
 			}
 			else { 
-				if (w->mRight->mColor == nodeColor::BLACK) {
+				if (isBLACK(rightOf(w))) {
 					//case-3: w's left is RED
-					w->mLeft->mColor = nodeColor::BLACK;
-					w->mColor = nodeColor::RED;
+					setBLACK(leftOf(w));
+					setRED(w);
 					rightRotate(w);
-					w = x->mParent->mRight;
+					w = rightOf(parentOf(x)); 
 				}
 
 				//fall-through
 				//case-4: w's right is RED
-				w->mColor = x->mParent->mColor;
-				x->mParent->mColor = nodeColor::BLACK;
-				w->mRight->mColor = nodeColor::BLACK;
-				leftRotate(x->mParent);
+				setColor(w, colorOf(parentOf(x)));
+				setBLACK(parentOf(x));
+				setBLACK(rightOf(w));
+				leftRotate(parentOf(x));
 				x = mRoot;
 			}	
 		}
 		else {
 			//if x is its parent's right child (symmetric case)
-			w = x->mParent->mLeft; //w is x's sibling;
+			w = leftOf(parentOf(x)); //w is x's sibling;
 			//4 cases
 			//case-1
-			if (w->mColor == nodeColor::RED) {
-				w->mColor = nodeColor::BLACK;
-				x->mParent->mColor = nodeColor::RED;
-				rightRotate(x->mParent);
-				w = x->mParent->mLeft;
+			if (isRED(w)) {
+				setBLACK(w);
+				setRED(parentOf(x));
+				rightRotate(parentOf(x));
+				w = leftOf(parentOf(x));
 			}
 			//fall-through
 			//sibling of w is now Black
-			if (w->mLeft->mColor == nodeColor::BLACK && w->mRight->mColor == nodeColor::BLACK) {
+			if (isBLACK(leftOf(w)) && isBLACK(rightOf(w))) {
 				//case-2: both of w's children are black
-				w->mColor = nodeColor::RED;
-				x = x->mParent;
+				setRED(w);
+				x = parentOf(x);
 			}
 			else { 
-				if (w->mLeft->mColor == nodeColor::BLACK) {
+				if (isBLACK(leftOf(w))) {
 					//case-3: w's right is RED, and left is black
-					w->mRight->mColor = nodeColor::BLACK;
-					w->mColor = nodeColor::RED;
+					setBLACK(rightOf(w));
+					setRED(w);
 					leftRotate(w);
-					w = x->mParent->mLeft;
+					w = leftOf(parentOf(x));
 				}
 				//fall-through
 				//case-4: w's left is RED
-				w->mColor = x->mParent->mColor;
-				x->mParent->mColor = nodeColor::BLACK;
-				w->mLeft->mColor = nodeColor::BLACK;
-				rightRotate(x->mParent);
+				setColor(w, colorOf(parentOf(x)));
+				setBLACK(parentOf(x));
+				setBLACK(leftOf(w));
+				rightRotate(parentOf(x));
 				x = mRoot;
 			}
 		}
 	}
-	x->mColor = nodeColor::BLACK;
+	setBLACK(x);
 	return;
 }
 
 //////////////////Traversal//////////////////
 template <class TKey, class TVal> 
-void    rbTree<TKey, TVal> :: inOrderWalk(rbTreeNode<TKey, TVal>* aNode, size_t aLevel, treeNodeVisitor<TKey, TVal>& visitor)
+void    RBTree<TKey, TVal> :: inOrderWalk(RBTreeNode<TKey, TVal>* aNode, size_t aLevel, TreeNodeVisitor<TKey, TVal>& visitor)
 {
-	rbTreeNode<TKey, TVal>* node = aNode;
+	RBTreeNode<TKey, TVal>* node = aNode;
 
 	if (node == mNil) {
 		visitor();
 		return;
 	}
 
-	inOrderWalk(node->mLeft, aLevel+1, visitor);
+	inOrderWalk(leftOf(node), aLevel+1, visitor);
 
-	visitor(node->mKey, node->mVal, ((node->mColor == nodeColor::RED) ? "R" : "B"), aLevel);
+	visitor(node->mKey, node->mVal, ((isRED(node)) ? "R" : "B"), aLevel);
 
-	inOrderWalk(node->mRight, aLevel+1, visitor);
+	inOrderWalk(rightOf(node), aLevel+1, visitor);
 	
 	return;
 }
 
 template <class TKey, class TVal> 
-void    rbTree<TKey, TVal> :: inOrderWalk(treeNodeVisitor<TKey, TVal>& visitor)
+void    RBTree<TKey, TVal> :: inOrderWalk(TreeNodeVisitor<TKey, TVal>& visitor)
 {
-	rbTreeNode<TKey, TVal>* node = mRoot;
+	RBTreeNode<TKey, TVal>* node = mRoot;
 
 	inOrderWalk(node, 0, visitor);
 }
 
 template <class TKey, class TVal>
-void    rbTree<TKey, TVal> :: preOrderWalk(rbTreeNode<TKey,TVal> *aNode, size_t aLevel, treeNodeVisitor<TKey, TVal>& visitor)
+void    RBTree<TKey, TVal> :: preOrderWalk(RBTreeNode<TKey,TVal> *aNode, size_t aLevel, TreeNodeVisitor<TKey, TVal>& visitor)
 {
 	if (aNode == mNil) {
 		visitor();
 		return;
 	}
 
-	visitor(aNode->mKey, aNode->mVal, ((aNode->mColor == nodeColor::RED) ? "R" : "B"), aLevel);
-	preOrderWalk(aNode->mLeft, aLevel+1, visitor);
-	preOrderWalk(aNode->mRight, aLevel+1, visitor);
+	visitor(aNode->mKey, aNode->mVal, (isRED(aNode) ? "R" : "B"), aLevel);
+	preOrderWalk(leftOf(aNode), aLevel+1, visitor);
+	preOrderWalk(rightOf(aNode), aLevel+1, visitor);
 	return;
 }
 
 template <class TKey, class TVal> 
-void    rbTree<TKey, TVal> :: preOrderWalk(treeNodeVisitor<TKey, TVal>& visitor)
+void    RBTree<TKey, TVal> :: preOrderWalk(TreeNodeVisitor<TKey, TVal>& visitor)
 {
-	rbTreeNode<TKey, TVal>* node = mRoot;
+	RBTreeNode<TKey, TVal>* node = mRoot;
 
 	preOrderWalk(node, 0, visitor);
 }
 /////////////////////verify Red-Black property/////////////
 template <class TKey, class TVal>
-bool    rbTree<TKey, TVal> :: verifyRB(rbTreeNode<TKey, TVal> * aNode, size_t & aBH) 
+bool    RBTree<TKey, TVal> :: verifyRB(RBTreeNode<TKey, TVal> * aNode, size_t & aBH) 
 {
 	if (aNode == mNil) {
 		return true;
 	}
 
-	if ( (aNode->mColor == nodeColor::RED) &&
-			(aNode->mLeft->mColor != nodeColor::BLACK || aNode->mRight->mColor != nodeColor::BLACK) ) {
+	if ( isRED(aNode) && (!isBLACK(leftOf(aNode)) || !isBLACK(rightOf(aNode)))) {
 		std::cout << "Node: " << aNode->mKey << " is RED but children are not BLACK" << std::endl;
 		return false;
 	}		
 
 	size_t leftBH = 0, rightBH = 0;
-	if (!verifyRB(aNode->mLeft, leftBH)) {
+	if (!verifyRB(leftOf(aNode), leftBH)) {
 		return false;
 	}
-	if (!verifyRB(aNode->mRight, rightBH)) {
+	if (!verifyRB(rightOf(aNode), rightBH)) {
 		return false;
 	}
 
@@ -541,14 +542,14 @@ bool    rbTree<TKey, TVal> :: verifyRB(rbTreeNode<TKey, TVal> * aNode, size_t & 
 				<< leftBH << " right black height = " << rightBH << std::endl;
 		return false;
 	}
-	aBH = leftBH + ((aNode->mColor == nodeColor::BLACK) ? 1 : 0);
+	aBH = leftBH + (isBLACK(aNode) ? 1 : 0);
 	return true;
 }
 
 template <class TKey, class TVal>
-bool    rbTree<TKey, TVal> :: verifyRB() 
+bool    RBTree<TKey, TVal> :: verifyRB() 
 {
-	if (mRoot->mColor != nodeColor::BLACK) {
+	if (!isBLACK(mRoot)) {
 		std::cout << "Root NOT BLACK" << std::endl;
 		return false;
 	}
@@ -563,12 +564,12 @@ bool    rbTree<TKey, TVal> :: verifyRB()
 
 #include <math.h>
 template <class TKey, class TVal>
-void    rbTree<TKey, TVal> :: printStats() 
+void    RBTree<TKey, TVal> :: printStats() 
 {
-	treeNodeStatVisitor<TKey, TVal> statvisitor;
+	TreeNodeStatVisitor<TKey, TVal> statvisitor;
 	statvisitor.reset();
 	inOrderWalk(statvisitor);
 	std::cout << "Nodes = " << statvisitor.mNodes << " Height = " << statvisitor.mHeight << std::endl;
 	std::cout << "Theoritical atmost rbtree height 2log(n+1): " << int(2 * log2(statvisitor.mNodes+1)) << std::endl;
 }
-}//namespace myDS
+}//namespace MyDS

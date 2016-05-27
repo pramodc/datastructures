@@ -5,8 +5,8 @@ int test2()
 {
 
 	int key = 1;
-	myDS::rbTree<int, int> bst;
-	myDS::treeNodePrintVisitor<int, int> printvisitor;
+	MyDS::RBTree<int, int> bst;
+	MyDS::TreeNodePrintVisitor<int, int> printvisitor;
 
 	bst.insert(key,10);
 	
@@ -85,8 +85,8 @@ int test1(size_t aNum)
 	int k;
 	std::string v;
 	srand(time(NULL));
-	myDS::rbTree<int, std::string> rbt;
-	myDS::treeNodePrintVisitor<int, std::string> printvisitor;
+	MyDS::RBTree<int, std::string> rbt;
+	MyDS::TreeNodePrintVisitor<int, std::string> printvisitor;
 
 	int i = 0;
 	while (i<aNum) {
