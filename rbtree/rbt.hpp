@@ -55,30 +55,33 @@ public:
 
 ///////////////////////////////////Treenode////////////////////////////////////
 template<class TKey, class TVal>
+struct RBTreeNodeMetaData {
+	RBTreeNode<TKey, TVal>* mLeft;
+	RBTreeNode<TKey, TVal>* mRight;
+	RBTreeNode<TKey, TVal>* mParent;
+	NodeColor mColor; 
+};
+
+template<class TKey, class TVal>
 class RBTreeNode {
 
 friend class RBTree <TKey, TVal>;
 
 private:
 	RBTreeNode () {
-		mLeft = nullptr;
-		mRight = nullptr;
-		mParent = nullptr;
-		mColor = NodeColor::BLACK;
+		mMetaData.mLeft = nullptr;
+		mMetaData.mRight = nullptr;
+		mMetaData.mParent = nullptr;
+		mMetaData.mColor = NodeColor::BLACK;
 	} 
 
-	RBTreeNode (TKey aKey, TVal aVal, NodeColor aCol, RBTreeNode* aLeft, RBTreeNode* aRight, RBTreeNode* aParent) 
-						: mKey(aKey), mVal(aVal), mColor(aCol), mLeft(aLeft), mRight(aRight), mParent(aParent) 
+	RBTreeNode (TKey aKey, TVal aVal, RBTreeNodeMetaData<TKey, TVal> aMetaData) : mKey(aKey), mVal(aVal), mMetaData(aMetaData)
 	{
 	} 
 	
 	TKey mKey;
 	TVal mVal;
-
-	RBTreeNode* mLeft;
-	RBTreeNode* mRight;
-	RBTreeNode* mParent;
-	NodeColor mColor; 
+	RBTreeNodeMetaData<TKey, TVal> mMetaData;
 };
 
 /////////////////////////////////////RBTree/////////////////////////////////////
@@ -116,48 +119,48 @@ private:
 
 	//Accessor functions
 	RBTreeNode<TKey,TVal>* leftOf(RBTreeNode<TKey,TVal>* aNode) const {
-		return aNode->mLeft;
+		return aNode->mMetaData.mLeft;
 	}
 	
 	RBTreeNode<TKey,TVal>* rightOf(RBTreeNode<TKey,TVal>* aNode) const {
-		return aNode->mRight;
+		return aNode->mMetaData.mRight;
 	}
 
 	RBTreeNode<TKey,TVal>* parentOf(RBTreeNode<TKey,TVal>* aNode) const {
-		return aNode->mParent;
+		return aNode->mMetaData.mParent;
 	}
 
 	NodeColor colorOf(RBTreeNode<TKey,TVal>* aNode) const {
-		return aNode->mColor;
+		return aNode->mMetaData.mColor;
 	}
 
 	bool isRED(RBTreeNode<TKey,TVal>* aNode) const {
-		return (aNode->mColor == NodeColor::RED);
+		return (aNode->mMetaData.mColor == NodeColor::RED);
 	}
 
 	bool isBLACK(RBTreeNode<TKey,TVal>* aNode) const {
-		return (aNode->mColor == NodeColor::BLACK);
+		return (aNode->mMetaData.mColor == NodeColor::BLACK);
 	}
 
 	//set functions
 	void setParent(RBTreeNode<TKey, TVal>* aDest, RBTreeNode<TKey, TVal>* aSrc) {
-		aDest->mParent = aSrc;
+		aDest->mMetaData.mParent = aSrc;
 	}
 	void setLeft(RBTreeNode<TKey, TVal>* aDest, RBTreeNode<TKey, TVal>* aSrc) {
-		aDest->mLeft = aSrc;
+		aDest->mMetaData.mLeft = aSrc;
 	}
 	void setRight(RBTreeNode<TKey, TVal>* aDest, RBTreeNode<TKey, TVal>* aSrc) {
-		aDest->mRight = aSrc;
+		aDest->mMetaData.mRight = aSrc;
 	}
 
 	void setRED(RBTreeNode<TKey, TVal>* aNode) {
-		aNode->mColor = NodeColor::RED;
+		aNode->mMetaData.mColor = NodeColor::RED;
 	}
 	void setBLACK(RBTreeNode<TKey, TVal>* aNode) {
-		aNode->mColor = NodeColor::BLACK;
+		aNode->mMetaData.mColor = NodeColor::BLACK;
 	}
 	void setColor(RBTreeNode<TKey, TVal>* aNode, NodeColor aColor) {
-		aNode->mColor = aColor;
+		aNode->mMetaData.mColor = aColor;
 	}
 };
 }//namespace MyDS

@@ -112,10 +112,10 @@ bool    RBTree<TKey, TVal> :: insert(TKey aKey, TVal aVal)
 	RBTreeNode<TKey, TVal> *node, *parent;
 
 	if (mRoot == mNil) {
-		mRoot = new RBTreeNode<TKey, TVal>(aKey, aVal, NodeColor::BLACK, mNil, mNil, mNil);//root is black
+		RBTreeNodeMetaData<TKey, TVal> mdata = {mNil, mNil, mNil, NodeColor::BLACK};
+		mRoot = new RBTreeNode<TKey, TVal>(aKey, aVal, mdata);//root is black
 		return true;
 	}
-	//return (insert (mRoot, aKey, aVal));
 	node = mRoot;
 	parent = mNil;
 	while (node != mNil) {
@@ -135,7 +135,8 @@ bool    RBTree<TKey, TVal> :: insert(TKey aKey, TVal aVal)
 	}
 	if (node == mNil) {
 		if (aKey < parent->mKey) {
-			setLeft(parent, new RBTreeNode<TKey, TVal>(aKey, aVal, NodeColor::RED, mNil, mNil, parent));
+			RBTreeNodeMetaData<TKey, TVal> mdata = {mNil, mNil, parent, NodeColor::RED};
+			setLeft(parent, new RBTreeNode<TKey, TVal>(aKey, aVal, mdata));
 			if (mVerbose >= 2) {
 				std::cout << "Walk before fixup" << std::endl;
 				TreeNodePrintVisitor<TKey, TVal> printvisitor;
@@ -151,7 +152,8 @@ bool    RBTree<TKey, TVal> :: insert(TKey aKey, TVal aVal)
 			}
 		}
 		else {
-			setRight(parent, new RBTreeNode<TKey, TVal>(aKey, aVal, NodeColor::RED, mNil, mNil, parent));
+			RBTreeNodeMetaData<TKey, TVal> mdata = {mNil, mNil, parent, NodeColor::RED};
+			setRight(parent, new RBTreeNode<TKey, TVal>(aKey, aVal, mdata));
 			if (mVerbose >= 2) {
 				std::cout << "Walk before fixup" << std::endl;
 				TreeNodePrintVisitor<TKey, TVal> printvisitor;
